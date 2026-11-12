@@ -1098,6 +1098,33 @@ iperf_parse_hostname(struct iperf_test *test, char *spec, char **p, char **p1) {
     }
 }
 
+/*
+ * Check that a test which keeps every interval report in memory until it
+ * ends (monolithic JSON output, or a server collecting its output for
+ * --get-server-output) does not keep more than MAX_INTERVAL_HISTORY reports.
+ * Returns 0 if OK, -1 with i_errno set otherwise.
+ */
+static int
+iperf_check_interval_history(struct iperf_test *test)
+{
+    int keeps_history;
+    double reports;
+
+    keeps_history = (test->json_output && (!test->json_stream || test->json_stream_full_output)) ||
+                    (test->role == 's' && test->get_server_output);
+
+    /* -t 0 (unlimited) and -i 0 (no interval reports) are not limited here */
+    if (!keeps_history || test->duration == 0 || test->stats_interval == 0)
+        return 0;
+
+    reports = (double) test->duration / test->stats_interval * (test->num_streams + 1);
+    if (reports > MAX_INTERVAL_HISTORY) {
+        i_errno = IEINTERVALHISTORY;
+        return -1;
+    }
+    return 0;
+}
+
 int
 iperf_parse_arguments(struct iperf_test *test, int argc, char **argv)
 {
@@ -2014,6 +2041,9 @@ iperf_parse_arguments(struct iperf_test *test, int argc, char **argv)
         return -1;
     }
 
+    if (test->role == 'c' && iperf_check_interval_history(test) < 0)
+        return -1;
+
     /* For subsequent calls to getopt */
 #ifdef __APPLE__
     optreset = 1;
@@ -2852,6 +2882,10 @@ get_parameters(struct iperf_test *test)
             i_errno = IEMAXSERVERTESTDURATIONEXCEEDED;
             r = -1;
         }
+
+        /* Ensure that the server does not keep too many interval reports in memory */
+        if (iperf_check_interval_history(test) < 0)
+            r = -1;
 
 
         /* Ensure that total requested data rate is not above the server's limit */

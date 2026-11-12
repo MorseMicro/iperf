@@ -213,6 +213,9 @@ iperf_strerror(int int_errno)
         case IEBADDSCP:
             snprintf(errstr, len, "bad DSCP value (numeric: 0-63 inclusive, symbolic: one of [af11-13, af21-23, af31-33, af41-43, cs1-7, ef, va, lowdelay, throughput, reliability])");
             break;
+        case IEINTERVALHISTORY:
+            snprintf(errstr, len, "too many interval reports kept in memory by -J, --json-stream-full-output or --get-server-output (time / interval * (parallel + 1) > %.0f); reduce -t or -P, increase -i, or use --json-stream", MAX_INTERVAL_HISTORY);
+            break;
         case IESETCLIENTAUTH:
             snprintf(errstr, len, "you must specify a username, password, and path to a valid RSA public key");
             break;
