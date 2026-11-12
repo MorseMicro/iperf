@@ -412,7 +412,7 @@ enum {
     IENOROLE = 2,           // Iperf must either be a client (-c) or server (-s)
     IESERVERONLY = 3,       // This option is server only
     IECLIENTONLY = 4,       // This option is client only
-    IEDURATION = 5,         // test duration too long. Maximum value = %dMAX_TIME
+    IEDURATION = 5,         // test duration too long. Maximum value = %dMAX_DURATION
     IENUMSTREAMS = 6,       // Number of parallel streams too large. Maximum value = %dMAX_STREAMS
     IEBLOCKSIZE = 7,        // Block size too large. Maximum value = %dMAX_BLOCKSIZE
     IEBUFSIZE = 8,          // Socket buffer size too large. Maximum value = %dMAX_TCP_BUFFER
@@ -448,6 +448,7 @@ enum {
     IEUNITVAL = 38,         // Invalid unit value or suffix
     IERVRSONLYSKIPRXCOPY = 39, // This OS does not support --skip-rx-copy
     IEBADDSCP = 40,         // Bad DSCP value
+    IEINTERVALHISTORY = 41, // Too many interval reports would be kept in memory (MAX_INTERVAL_HISTORY)
     /* Test errors */
     IENEWTEST = 100,        // Unable to create a new test (check perror)
     IEINITTEST = 101,       // Test initialization failed (check perror)
